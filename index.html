@@ -2,543 +2,255 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Dispatch Report Builder | Material Planner</title>
-    <!-- SheetJS for Excel parsing -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <!-- Tesseract for OCR from image uploads (lightweight, client-side) -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGX Machinery Daily Report - 03-05-2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        body { font-family: 'Segoe UI', system-ui, sans-serif; }
+        .machine-row:hover { background-color: #f8fafc; transition: all 0.2s; }
+        th, td { padding: 14px 12px; text-align: center; }
+        .header-gradient { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+        .section-card { 
+            transition: all 0.3s ease; 
         }
-        body {
-            background: #f0f4f8;
-            margin: 0;
-            padding: 24px 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        /* upload zone */
-        .upload-panel {
-            background: white;
-            border-radius: 28px;
-            padding: 20px 28px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            margin-bottom: 32px;
-            transition: all 0.2s;
-        }
-        .upload-title {
-            font-weight: 700;
-            font-size: 1.4rem;
-            margin-bottom: 12px;
-            color: #1e2a3e;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .flex-upload {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 24px;
-            align-items: flex-end;
-        }
-        .file-box {
-            flex: 1;
-            min-width: 200px;
-        }
-        .file-box label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #2c3e66;
-        }
-        .file-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #cad2db;
-            border-radius: 20px;
-            background: #fefefe;
-            font-size: 0.9rem;
-        }
-        button {
-            background: #1f6392;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        button:hover {
-            background: #0e4a70;
-            transform: scale(0.97);
-        }
-        .status {
-            margin-top: 18px;
-            font-size: 0.85rem;
-            background: #e9ecef;
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: #2d3e50;
-        }
-        .report-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 28px;
-            margin-top: 20px;
-        }
-        .report-card {
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
-            overflow-x: auto;
-            flex: 1;
-            min-width: 320px;
-            padding: 20px 0 16px 0;
-        }
-        .report-header {
-            padding: 0 20px 12px 20px;
-            font-weight: 800;
-            font-size: 1.35rem;
-            border-bottom: 3px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-        }
-        .badge-download {
-            display: flex;
-            gap: 12px;
-        }
-        .badge-download button {
-            background: #f1f5f9;
-            color: #1e2a3e;
-            font-size: 0.7rem;
-            padding: 5px 12px;
-            box-shadow: none;
-            border: 1px solid #cbd5e1;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            min-width: 680px;
-        }
-        th, td {
-            border: 1px solid #dce5ef;
-            padding: 10px 8px;
-            text-align: center;
-            vertical-align: middle;
-        }
-        th {
-            background: #f8fafc;
-            font-weight: 700;
-            color: #1e293b;
-        }
-        .grand-total-row {
-            background: #f1f5f9;
-            font-weight: 700;
-        }
-        .summary-table {
-            margin-top: 16px;
-        }
-        .cash-credit {
-            margin-top: 20px;
-            background: #f9fbfd;
-            border-radius: 20px;
-            padding: 12px 20px;
-            display: flex;
-            gap: 32px;
-            font-weight: 600;
-            border: 1px solid #e2edf7;
-        }
-        .footer-note {
-            font-size: 0.75rem;
-            text-align: right;
-            margin-top: 16px;
-            color: #4a627a;
-            padding-right: 20px;
-        }
-        hr {
-            margin: 10px 0;
-        }
-        @media (max-width: 760px) {
-            .upload-panel { padding: 16px; }
-            .report-card { margin: 0; }
+        .section-card:hover { 
+            transform: translateY(-6px); 
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15); 
         }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="upload-panel">
-        <div class="upload-title">
-            📊 Dispatch Report Builder
-            <span style="font-size:0.8rem;">(Image OCR or Excel upload)</span>
-        </div>
-        <div class="flex-upload">
-            <div class="file-box">
-                <label>📷 Upload Image (PNG/JPG) - OCR extraction</label>
-                <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/jpg" class="file-input">
-            </div>
-            <div class="file-box">
-                <label>📁 Upload Excel (.xlsx, .xls) - SheetJS</label>
-                <input type="file" id="excelUpload" accept=".xlsx, .xls, .csv" class="file-input">
-            </div>
+<body class="bg-gray-50">
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- Header -->
+    <div class="header-gradient text-white rounded-3xl p-8 mb-10 shadow-2xl">
+        <div class="flex justify-between items-center">
             <div>
-                <button id="processBtn">▶ Process & Generate Reports</button>
+                <h1 class="text-4xl font-bold tracking-tight">SGX Machinery Performance Report</h1>
+                <p class="text-blue-100 mt-2 text-xl">Date: <span class="font-semibold">03-05-2026</span></p>
+            </div>
+            <div class="text-right">
+                <div class="text-sm opacity-90">Prepared for</div>
+                <div class="font-bold text-3xl">SGX QUARRY</div>
             </div>
         </div>
-        <div id="statusMsg" class="status">⚡ Ready: Upload image or Excel file, then click process. System will parse data into Full Day & Shift-wise reports.</div>
     </div>
 
-    <div class="report-grid">
-        <!-- LEFT: FULL DAY Dispatch Vehicle Wise Planning (original style) -->
-        <div class="report-card">
-            <div class="report-header">
-                <span>📆 FULL DAY - Dispatch Vehicle Wise Planning<br><span style="font-size:0.7rem;">22 Apr 2026 (sample format)</span></span>
-                <div class="badge-download">
-                    <button id="downloadFullPDFBtn">📄 Download PDF Report</button>
-                    <button id="downloadFullExcelBtn">📎 Download Excel Report</button>
-                </div>
-            </div>
-            <div style="overflow-x: auto;">
-                <table id="fullDayTable">
-                    <thead>
-                        <tr><th>Client Details</th><th>Unit</th><th>10 MM</th><th>20 MM</th><th>V/SAND</th><th>Scalping</th><th>P/Sand</th><th>40MM</th><th>GSB/WET MIX</th><th>R/Sand</th><th>TOTAL (MT)</th></tr>
-                    </thead>
-                    <tbody id="fullDayBody">
-                        <tr><td colspan="10">⬆️ Upload data to generate Full Day report</td></tr>
-                    </tbody>
-                    <tfoot id="fullDayFoot"></tfoot>
-                </table>
-            </div>
-            <div class="footer-note">* Grand Total Trips & Tonnage derived from data</div>
+    <!-- Section 1: Machine Availability & HMR -->
+    <div class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <i class="fas fa-truck text-blue-600"></i> Machine Availability & HMR Status
+        </h2>
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden section-card">
+            <table class="w-full text-sm">
+                <thead class="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+                    <tr>
+                        <th class="text-left w-5/12 pl-8">Machine Name</th>
+                        <th>Start HMR</th>
+                        <th>End HMR</th>
+                        <th>FTD</th>
+                        <th>MTD</th>
+                        <th>Day</th>
+                        <th>Night</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y text-gray-700">
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">SDLG Loader 1 (L936H)</td>
+                        <td>11196.4</td><td>11196.4</td><td>0</td><td>0</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">SDLG Loader 2 (L936H)</td>
+                        <td>10891.7</td><td>10907</td><td>15.3</td><td>70</td>
+                        <td class="bg-blue-100 text-blue-700 font-bold">B</td>
+                        <td class="bg-blue-100 text-blue-700 font-bold">B</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">Volvo Excavator EC210DL (OLD)</td>
+                        <td>8054.8</td><td>8058</td><td>3.2</td><td>8</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">Volvo Excavator EC210DL (NEW)</td>
+                        <td>6752.4</td><td>6764.7</td><td>12.3</td><td>64</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">VOLVO EXCAVATOR-1 (KMH-1) GOVIND</td>
+                        <td>11738</td><td>11746</td><td>8</td><td>31</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">VOLVO EXCAVATOR-2 (KMH-1) GOVIND</td>
+                        <td>8354.3</td><td>8367.3</td><td>13</td><td>54</td>
+                        <td class="bg-blue-100 text-blue-700 font-bold">B</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">Hyundai Plant Rental</td>
+                        <td>3618.7</td><td>3631.1</td><td>12.4</td><td>49</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">Hyundai Excavator - 1</td>
+                        <td>7886.7</td><td>7897.4</td><td>10.7</td><td>58</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">Hyundai Excavator - 2</td>
+                        <td>650.9</td><td>660.2</td><td>9.3</td><td>66</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                        <td class="bg-red-100 text-red-700 font-bold">R</td>
+                    </tr>
+                    <tr class="machine-row">
+                        <td class="text-left font-medium pl-8">Rental - BEML BD50 Dozer</td>
+                        <td>182.7</td><td>182.7</td><td>0</td><td>0</td>
+                        <td class="bg-blue-100 text-blue-700 font-bold">B</td>
+                        <td class="bg-blue-100 text-blue-700 font-bold">B</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- RIGHT: SHIFT WISE (A-SHIFT / B-SHIFT) + Summary -->
-        <div class="report-card">
-            <div class="report-header">
-                <span>🔄 SHIFT-WISE PLANNING (A-Shift / B-Shift)</span>
-                <div class="badge-download">
-                    <button id="downloadShiftExcelBtn">📎 Export Shift Report</button>
+    <!-- Section 2: Shift Wise Break-up (Single Shift - Combined) -->
+    <div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <i class="fas fa-chart-bar text-blue-600"></i> Machinery Utilization Break-up - 03-05-2026
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- FTD Card -->
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden section-card">
+                <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-6">
+                    <h3 class="text-2xl font-bold flex items-center gap-3">
+                        <i class="fas fa-sun"></i> FTD Work (Fuel To Date)
+                    </h3>
                 </div>
-            </div>
-            <div style="overflow-x: auto;">
-                <h4 style="margin: 0 16px 8px 16px; color:#2c5a7a;">🔆 A-SHIFT (Day Shift)</h4>
-                <table id="dayShiftTable">
-                    <thead><tr><th>Customer Name</th><th>10 MM</th><th>20 MM</th><th>V/SAND</th><th>Scalping</th><th>P/Sand</th><th>40MM</th><th>GSB/WET MIX</th><th>R/Sand</th><th>TOTAL MT</th></tr></thead>
-                    <tbody id="dayShiftBody"><tr><td colspan="9">— no data —</td></tr></tbody>
-                </table>
-                <h4 style="margin: 20px 16px 8px 16px; color:#2c5a7a;">🌙 B-SHIFT (Night Shift)</h4>
-                <table id="nightShiftTable">
-                    <thead><tr><th>Customer Name</th><th>10 MM</th><th>20 MM</th><th>V/SAND</th><th>Scalping</th><th>P/Sand</th><th>40MM</th><th>GSB/WET MIX</th><th>R/Sand</th><th>TOTAL MT</th></tr></thead>
-                    <tbody id="nightShiftBody"><tr><td colspan="9">— no data —</td></tr></tbody>
-                </table>
-                <div style="margin: 24px 16px 12px 16px;">
-                    <table id="summaryShiftTable" style="background:#fef9e6;">
-                        <thead><tr><th>Shift</th><th>No of Vehicles</th><th>10 MM</th><th>20 MM</th><th>V/SAND</th><th>Scalping</th><th>P/Sand</th><th>40MM</th><th>GSB/WET MIX</th><th>R/Sand</th><th>Grand Total MT</th></tr></thead>
-                        <tbody id="summaryBody"></tbody>
+                <div class="p-6">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="text-left w-48">Machine</th>
+                                <th>Breaking Boulder</th>
+                                <th>Loading OB</th>
+                                <th>Loading</th>
+                                <th>Sheet Cleaning</th>
+                                <th>Safety / Maint.</th>
+                                <th class="bg-emerald-600 text-white">Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y text-gray-700">
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">SGX Volvo -2</td>
+                                <td>4.9</td><td>3</td><td>3</td><td>4</td><td>0</td>
+                                <td class="font-bold bg-emerald-50">14.9</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Govind Volvo -1</td>
+                                <td>1.5</td><td>1</td><td>0</td><td>0</td><td>0</td>
+                                <td class="font-bold">2.5</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Govind Volvo -2</td>
+                                <td>5.8</td><td>3</td><td>1</td><td>0</td><td>0</td>
+                                <td class="font-bold">9.8</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Hyundai -1</td>
+                                <td>5.7</td><td>5</td><td>0</td><td>0</td><td>0</td>
+                                <td class="font-bold">10.7</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Hyundai -2</td>
+                                <td>5</td><td>7</td><td>1</td><td>0</td><td>0</td>
+                                <td class="font-bold">13</td>
+                            </tr>
+                            <tr class="bg-emerald-50 font-bold border-t-4 border-emerald-600">
+                                <td class="text-left">FTD TOTAL</td>
+                                <td>23</td><td>19</td><td>5</td><td>4</td><td>0</td>
+                                <td class="bg-emerald-600 text-white text-xl">51</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
-                <div class="cash-credit" id="cashCreditBlock">
-                    <span>💰 Total Cash Sale Amount: ₹0.00</span>
-                    <span>💳 Total Credit Sale Amount: ₹66290.80</span>
-                </div>
-                <div class="footer-note" style="margin-top: 6px;">* Combined trips & vehicles computed from shift assignments.</div>
             </div>
+
+            <!-- MTD Card -->
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden section-card">
+                <div class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-6">
+                    <h3 class="text-2xl font-bold flex items-center gap-3">
+                        <i class="fas fa-calendar-alt"></i> MTD Work (Month To Date)
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="text-left w-48">Machine</th>
+                                <th>Breaking Boulder</th>
+                                <th>Loading OB</th>
+                                <th>Loading</th>
+                                <th>Sheet Cleaning</th>
+                                <th>Safety / Maint.</th>
+                                <th class="bg-emerald-600 text-white">Total Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y text-gray-700">
+                            <!-- Sample MTD data - update as needed -->
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">SGX Volvo -2</td>
+                                <td>68</td><td>55</td><td>31</td><td>15</td><td>6</td>
+                                <td class="font-bold">175</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Govind Volvo -1</td>
+                                <td>28</td><td>18</td><td>8</td><td>3</td><td>0</td>
+                                <td class="font-bold">57</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Govind Volvo -2</td>
+                                <td>52</td><td>36</td><td>18</td><td>8</td><td>3</td>
+                                <td class="font-bold">117</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Hyundai -1</td>
+                                <td>72</td><td>58</td><td>25</td><td>8</td><td>5</td>
+                                <td class="font-bold">168</td>
+                            </tr>
+                            <tr class="machine-row">
+                                <td class="text-left font-medium">Hyundai -2</td>
+                                <td>58</td><td>68</td><td>22</td><td>6</td><td>6</td>
+                                <td class="font-bold">160</td>
+                            </tr>
+                            <tr class="bg-emerald-50 font-bold border-t-4 border-emerald-600">
+                                <td class="text-left">MTD TOTAL</td>
+                                <td>278</td><td>235</td><td>104</td><td>40</td><td>20</td>
+                                <td class="bg-emerald-600 text-white text-xl">677</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
+
+    <!-- Footer -->
+    <div class="mt-16 text-center text-gray-400 text-xs">
+        <p>SGX Quarry • Machinery Utilization Report • 03 May 2026</p>
+        <p class="mt-1">FTD = Fuel To Date | MTD = Month To Date</p>
+    </div>
+
 </div>
-
-<script>
-    // --------------------- GLOBAL DATA STORES -------------------------
-    let parsedFullData = {
-        clients: [],     // array of objects: { name, unit, tonnages: {10MM,20MM,V/SAND,Scalping,P/Sand,40MM,GSB,R/Sand}, totalMT, trips }
-        grandTotalMT: 0,
-        grandTotalTrips: 0,
-        materialTotals: { "10MM":0,"20MM":0,"V/SAND":0,"Scalping":0,"P/Sand":0,"40MM":0,"GSB/WET MIX":0,"R/Sand":0 }
-    };
-
-    let shiftData = {
-        day: [],    // { customer, 10MM,20MM,... totalMT }
-        night: []
-    };
-    let combinedVehicles = 0;
-
-    // default credit amount (can be computed from total tonnage * rate if needed, but we keep sample as per original: ₹66290.80)
-    let creditAmount = 66290.80;
-    let cashAmount = 0;
-
-    // ---------- Helper: parse extracted text / Excel rows into internal structure ----------
-    function parseRawDataToReports(rowsArray) {
-        // rowsArray expected to be an array of arrays (like sheet data) OR object array
-        // We'll try to detect structure: columns likely contain "Client Details", "Total Tonnage (MT)", "Total Trips", material names
-        // Also supports the "L & T P2 – Rambali" pattern.
-        // We will build both full day and shift inference: shift based on keywords (A-SHIFT / B-SHIFT) or if "Day Shift" / "Night Shift" 
-        // But for simplicity we also check if rows have "A-SHIFT" or "B-SHIFT" sections. 
-        // However, given typical report format from images, we design robust detection: 
-        // first map full day client entries: any row with "Total Tonnage (MT)" and "Total Trips"
-        
-        let fullClients = [];
-        let dayShiftRows = [];
-        let nightShiftRows = [];
-        let isParsingDay = false, isParsingNight = false;
-        
-        // traverse rows to identify sections
-        for (let i = 0; i < rowsArray.length; i++) {
-            let row = rowsArray[i];
-            if (!row || row.length === 0) continue;
-            let firstCell = (row[0] || "").toString().trim();
-            let secondCell = (row[1] || "").toString().trim();
-            
-            // detect shift headers
-            if (firstCell.includes("A-SHIFT") || firstCell.includes("Day Shift")) {
-                isParsingDay = true;
-                isParsingNight = false;
-                continue;
-            }
-            if (firstCell.includes("B-SHIFT") || firstCell.includes("Night Shift")) {
-                isParsingNight = true;
-                isParsingDay = false;
-                continue;
-            }
-            // detect full day client lines: pattern "Client Details" or lines where second column is "Total Tonnage (MT)"? Actually typical row: "L & T P2 – Rambali" then next row "Total Tonnage (MT)" etc.
-            // More robust: row includes "Total Tonnage" in any cell? but we detect client name row if first cell is not empty and not "Total Tonnage" etc.
-            if ((firstCell.includes("L & T") || firstCell.includes("Bharath") || firstCell.includes("Afcyan") || firstCell.includes("Jio") || firstCell.match(/[A-Za-z]+\s+[–\-]\s+[A-Za-z]/)) && !firstCell.includes("Total")) {
-                // attempt to extract tonnages from subsequent row? Actually data in original table has row: Client Details then below row unit+tonnage. But easier: assume row contains numeric values in material columns.
-                // we'll try to parse materials from same row if present numeric columns
-                let clientName = firstCell;
-                let unitCell = (row[1] || "").toString();
-                let tenMM = parseFloat(row[2]) || 0;
-                let twentyMM = parseFloat(row[3]) || 0;
-                let vSand = parseFloat(row[4]) || 0;
-                let scalping = parseFloat(row[5]) || 0;
-                let pSand = parseFloat(row[6]) || 0;
-                let fortyMM = parseFloat(row[7]) || 0;
-                let gsb = parseFloat(row[8]) || 0;
-                let rSand = parseFloat(row[9]) || 0;
-                let total = parseFloat(row[10]) || (tenMM+twentyMM+vSand+scalping+pSand+fortyMM+gsb+rSand);
-                // trips maybe from another column? sometimes column 11 trips, we can infer default trips = 1 if tonnage>0
-                let trips = 1;
-                if(row.length > 11 && !isNaN(parseFloat(row[11]))) trips = parseFloat(row[11]);
-                else if(total>0) trips = Math.ceil(total / 25); // heuristic, but we later refine from actual trips column
-                if(total>0 || tenMM+twentyMM>0){
-                    fullClients.push({
-                        name: clientName,
-                        unit: unitCell || "MT",
-                        tonnages: { "10MM":tenMM, "20MM":twentyMM, "V/SAND":vSand, "Scalping":scalping, "P/Sand":pSand, "40MM":fortyMM, "GSB/WET MIX":gsb, "R/Sand":rSand },
-                        totalMT: total,
-                        trips: trips
-                    });
-                }
-            }
-            
-            // parse shift specific rows (A/B shift table)
-            if ((isParsingDay || isParsingNight) && firstCell && !firstCell.includes("SHIFT") && !firstCell.includes("Customer") && !firstCell.includes("Total") && firstCell.trim().length>0) {
-                let cust = firstCell;
-                let ten = parseFloat(row[1]) || 0;
-                let twenty = parseFloat(row[2]) || 0;
-                let vSand = parseFloat(row[3]) || 0;
-                let scalping = parseFloat(row[4]) || 0;
-                let pSand = parseFloat(row[5]) || 0;
-                let forty = parseFloat(row[6]) || 0;
-                let gsb = parseFloat(row[7]) || 0;
-                let rSand = parseFloat(row[8]) || 0;
-                let total = parseFloat(row[9]) || (ten+twenty+vSand+scalping+pSand+forty+gsb+rSand);
-                let entry = { customer: cust, "10MM":ten, "20MM":twenty, "V/SAND":vSand, "Scalping":scalping, "P/Sand":pSand, "40MM":forty, "GSB/WET MIX":gsb, "R/Sand":rSand, totalMT: total };
-                if(isParsingDay) dayShiftRows.push(entry);
-                else if(isParsingNight) nightShiftRows.push(entry);
-            }
-        }
-        
-        // if we didn't get any clients via above, attempt fallback: look for rows with "Total Tonnage (MT)" pattern adjacent
-        if(fullClients.length === 0){
-            for(let i=0; i<rowsArray.length-1; i++){
-                let row = rowsArray[i];
-                let nextRow = rowsArray[i+1];
-                if(row && row[0] && row[0].toString().includes("Total Tonnage")) continue;
-                if(nextRow && nextRow[0] && nextRow[0].toString().includes("Total Tonnage")){
-                    let clientName = (row[0] || "").toString();
-                    if(clientName && !clientName.includes("Client") && !clientName.includes("GRAND")){
-                        let tonnageVal = parseFloat(nextRow[1]) || 0;
-                        let tripsVal = 1;
-                        if(rowsArray[i+2] && rowsArray[i+2][0] && rowsArray[i+2][0].toString().includes("Total Trips")) tripsVal = parseFloat(rowsArray[i+2][1]) || 1;
-                        // material distribution? default unknown, we can assign tonnage to main category guess
-                        let matGuess = {};
-                        if(row[2] && !isNaN(parseFloat(row[2]))) matGuess["20MM"] = parseFloat(row[2]);
-                        else if(row[3] && !isNaN(parseFloat(row[3]))) matGuess["20MM"] = parseFloat(row[3]);
-                        else matGuess["20MM"] = tonnageVal;
-                        fullClients.push({
-                            name: clientName, unit: "MT", tonnages: { ...matGuess, "10MM":0,"V/SAND":0,"Scalping":0,"P/Sand":0,"40MM":0,"GSB/WET MIX":0,"R/Sand":0 }, totalMT: tonnageVal, trips: tripsVal
-                        });
-                    }
-                }
-            }
-        }
-        
-        // also from full day image we see rows with L&T P2 etc. final build totals
-        if(fullClients.length === 0 && rowsArray.length>2){
-            for(let r of rowsArray){
-                let first = (r[0] || "").toString();
-                if(first.match(/L\s*&\s*T|Bharath|Afcyan|Jio/i) && !first.includes("TOTAL")){
-                    let vals = r.slice(2,10).map(v => parseFloat(v) || 0);
-                    let total = vals.reduce((a,b)=>a+b,0);
-                    fullClients.push({ name: first, unit: r[1] || "MT", tonnages: {"10MM":vals[0]||0,"20MM":vals[1]||0,"V/SAND":vals[2]||0,"Scalping":vals[3]||0,"P/Sand":vals[4]||0,"40MM":vals[5]||0,"GSB/WET MIX":vals[6]||0,"R/Sand":vals[7]||0}, totalMT: total, trips: (parseFloat(r[10]) || 1) });
-                }
-            }
-        }
-        
-        // update full data
-        let grandMT = 0, grandTrips=0;
-        let matTot = { "10MM":0,"20MM":0,"V/SAND":0,"Scalping":0,"P/Sand":0,"40MM":0,"GSB/WET MIX":0,"R/Sand":0 };
-        fullClients.forEach(c => {
-            grandMT += c.totalMT;
-            grandTrips += c.trips;
-            for(let k in matTot) matTot[k] += (c.tonnages[k] || 0);
-        });
-        parsedFullData.clients = fullClients;
-        parsedFullData.grandTotalMT = grandMT;
-        parsedFullData.grandTotalTrips = grandTrips;
-        parsedFullData.materialTotals = matTot;
-        
-        // shift data: if dayShiftRows/nightShiftRows extracted, use them, else build from full clients by heuristic splitting (based on typical patterns from original images)
-        if(dayShiftRows.length === 0 && nightShiftRows.length === 0 && fullClients.length>0){
-            // simulate split: as per original report pattern: L&T P2 - Rambali day had 41.80 (20MM), Bharath Verma day, Afcyan day. Night: L&T P2 50.04 + L&T Jio
-            for(let c of fullClients){
-                if(c.name.includes("Rambali")){
-                    let dayPortion = (c.totalMT * 0.45); // heuristic but original: 41.80 vs 50.04, we use actual tonnage from materials
-                    let nightPortion = c.totalMT - dayPortion;
-                    if(c.tonnages["20MM"]){
-                        dayShiftRows.push({ customer: c.name+" (Day)", "20MM": c.tonnages["20MM"]>50?50.04:41.80, totalMT: c.tonnages["20MM"]>50?50.04:41.80, ...emptyMaterial() });
-                    } else dayShiftRows.push({ customer: c.name, ...c.tonnages, totalMT: c.totalMT/2 });
-                }
-                else if(c.name.includes("Bharath") || c.name.includes("Airport")) dayShiftRows.push({ customer: c.name, ...c.tonnages, totalMT: c.totalMT });
-                else if(c.name.includes("Afcyan")) dayShiftRows.push({ customer: c.name, ...c.tonnages, totalMT: c.totalMT });
-                else if(c.name.includes("Jio")) nightShiftRows.push({ customer: c.name, ...c.tonnages, totalMT: c.totalMT });
-                else nightShiftRows.push({ customer: c.name, ...c.tonnages, totalMT: c.totalMT });
-            }
-            // ensure unique values
-        }
-        shiftData.day = dayShiftRows;
-        shiftData.night = nightShiftRows;
-        
-        // vehicles count = day rows + night rows
-        combinedVehicles = (shiftData.day.length + shiftData.night.length) || fullClients.length;
-        if(combinedVehicles === 0 && fullClients.length) combinedVehicles = fullClients.length;
-        
-        // update credit amount based on total tonnage (example: rate approx 343 Rs per ton? but keep original sample)
-        if(grandMT>0 && grandMT !== 193.15) creditAmount = grandMT * 343.2; // approximation, but preserve original text default if close
-        if(Math.abs(grandMT-193.15)<0.1) creditAmount = 66290.80;
-        else creditAmount = Math.round(grandMT * 343.2 *100)/100;
-    }
-    
-    function emptyMaterial(){
-        return {"10MM":0,"20MM":0,"V/SAND":0,"Scalping":0,"P/Sand":0,"40MM":0,"GSB/WET MIX":0,"R/Sand":0, totalMT:0};
-    }
-    
-    // ----- render full day table -----
-    function renderFullDay(){
-        let tbody = document.getElementById("fullDayBody");
-        let foot = document.getElementById("fullDayFoot");
-        if(parsedFullData.clients.length === 0){
-            tbody.innerHTML = '<tr><td colspan="10">📭 No data extracted. Upload image/excel with dispatch planning.</td></tr>';
-            foot.innerHTML = '';
-            return;
-        }
-        let html = '';
-        parsedFullData.clients.forEach(c => {
-            let t = c.tonnages;
-            html += `<tr>
-                <td style="text-align:left">${c.name}</td>
-                <td>${c.unit}</td>
-                <td>${t["10MM"]?t["10MM"].toFixed(2):'0.00'}</td>
-                <td>${t["20MM"]?t["20MM"].toFixed(2):'0.00'}</td>
-                <td>${t["V/SAND"]?t["V/SAND"].toFixed(2):'0.00'}</td>
-                <td>${t["Scalping"]?t["Scalping"].toFixed(2):'0.00'}</td>
-                <td>${t["P/Sand"]?t["P/Sand"].toFixed(2):'0.00'}</td>
-                <td>${t["40MM"]?t["40MM"].toFixed(2):'0.00'}</td>
-                <td>${t["GSB/WET MIX"]?t["GSB/WET MIX"].toFixed(2):'0.00'}</td>
-                <td>${t["R/Sand"]?t["R/Sand"].toFixed(2):'0.00'}</td>
-                <td><strong>${c.totalMT.toFixed(2)}</strong></td>
-            </tr>`;
-        });
-        html += `<tr class="grand-total-row"><td colspan="2"><strong>GRAND TOTAL</strong></td>
-                <td>${parsedFullData.materialTotals["10MM"].toFixed(2)}</td><td>${parsedFullData.materialTotals["20MM"].toFixed(2)}</td>
-                <td>${parsedFullData.materialTotals["V/SAND"].toFixed(2)}</td><td>${parsedFullData.materialTotals["Scalping"].toFixed(2)}</td>
-                <td>${parsedFullData.materialTotals["P/Sand"].toFixed(2)}</td><td>${parsedFullData.materialTotals["40MM"].toFixed(2)}</td>
-                <td>${parsedFullData.materialTotals["GSB/WET MIX"].toFixed(2)}</td><td>${parsedFullData.materialTotals["R/Sand"].toFixed(2)}</td>
-                <td><strong>${parsedFullData.grandTotalMT.toFixed(2)}</strong></td></tr>`;
-        tbody.innerHTML = html;
-        foot.innerHTML = `<tr><td colspan="11" style="text-align:left">📦 TOTAL TRIPS: ${parsedFullData.grandTotalTrips}</td></tr>`;
-    }
-    
-    function renderShiftAndSummary(){
-        let dayBody = document.getElementById("dayShiftBody");
-        let nightBody = document.getElementById("nightShiftBody");
-        let summaryBody = document.getElementById("summaryBody");
-        let dayHtml = shiftData.day.length ? '' : '<tr><td colspan="9">No day shift entries</td></tr>';
-        shiftData.day.forEach(d => {
-            dayHtml += `<tr><td style="text-align:left">${d.customer}</td><td>${d["10MM"]||0}</td><td>${d["20MM"]||0}</td><td>${d["V/SAND"]||0}</td><td>${d["Scalping"]||0}</td><td>${d["P/Sand"]||0}</td><td>${d["40MM"]||0}</td><td>${d["GSB/WET MIX"]||0}</td><td>${d["R/Sand"]||0}</td><td>${(d.totalMT || 0).toFixed(2)}</td></tr>`;
-        });
-        let nightHtml = shiftData.night.length ? '' : '<tr><td colspan="9">No night shift entries</td></tr>';
-        shiftData.night.forEach(n => {
-            nightHtml += `<tr><td style="text-align:left">${n.customer}</td><td>${n["10MM"]||0}</td><td>${n["20MM"]||0}</td><td>${n["V/SAND"]||0}</td><td>${n["Scalping"]||0}</td><td>${n["P/Sand"]||0}</td><td>${n["40MM"]||0}</td><td>${n["GSB/WET MIX"]||0}</td><td>${n["R/Sand"]||0}</td><td>${(n.totalMT || 0).toFixed(2)}</td></tr>`;
-        });
-        dayBody.innerHTML = dayHtml;
-        nightBody.innerHTML = nightHtml;
-        let dayTotalMT = shiftData.day.reduce((s, r) => s + (r.totalMT || 0),0);
-        let nightTotalMT = shiftData.night.reduce((s, r) => s + (r.totalMT || 0),0);
-        let sumMat = (arr, key) => arr.reduce((s,r)=> s+(r[key]||0),0);
-        summaryBody.innerHTML = `<tr><td>Day Shift Total</td><td>${shiftData.day.length}</td><td>${sumMat(shiftData.day,"10MM").toFixed(2)}</td><td>${sumMat(shiftData.day,"20MM").toFixed(2)}</td><td>${sumMat(shiftData.day,"V/SAND").toFixed(2)}</td><td>${sumMat(shiftData.day,"Scalping").toFixed(2)}</td><td>${sumMat(shiftData.day,"P/Sand").toFixed(2)}</td><td>${sumMat(shiftData.day,"40MM").toFixed(2)}</td><td>${sumMat(shiftData.day,"GSB/WET MIX").toFixed(2)}</td><td>${sumMat(shiftData.day,"R/Sand").toFixed(2)}</td><td>${dayTotalMT.toFixed(2)}</td></tr>
-        <tr><td>Night Shift Total</td><td>${shiftData.night.length}</td><td>${sumMat(shiftData.night,"10MM").toFixed(2)}</td><td>${sumMat(shiftData.night,"20MM").toFixed(2)}</td><td>${sumMat(shiftData.night,"V/SAND").toFixed(2)}</td><td>${sumMat(shiftData.night,"Scalping").toFixed(2)}</td><td>${sumMat(shiftData.night,"P/Sand").toFixed(2)}</td><td>${sumMat(shiftData.night,"40MM").toFixed(2)}</td><td>${sumMat(shiftData.night,"GSB/WET MIX").toFixed(2)}</td><td>${sumMat(shiftData.night,"R/Sand").toFixed(2)}</td><td>${nightTotalMT.toFixed(2)}</td></tr>
-        <tr style="background:#e9f0f5"><td><strong>Combined Total</strong></td><td><strong>${shiftData.day.length+shiftData.night.length}</strong></td><td colspan="9"><strong>Overall Grand Total Vehicles: ${shiftData.day.length+shiftData.night.length} &nbsp;| Total MT: ${(dayTotalMT+nightTotalMT).toFixed(2)}</strong></td></tr>`;
-        document.getElementById("cashCreditBlock").innerHTML = `<span>💰 Total Cash Sale Amount: ₹${cashAmount.toFixed(2)}</span><span>💳 Total Credit Sale Amount: ₹${creditAmount.toFixed(2)}</span>`;
-    }
-    
-    // process from excel or OCR text
-    async function processFromData(dataRows){
-        parseRawDataToReports(dataRows);
-        renderFullDay();
-        renderShiftAndSummary();
-        document.getElementById("statusMsg").innerHTML = "✅ Reports generated from uploaded data!";
-    }
-    
-    document.getElementById("processBtn").addEventListener("click", async () => {
-        let excelFile = document.getElementById("excelUpload").files[0];
-        let imageFile = document.getElementById("imageUpload").files[0];
-        if(!excelFile && !imageFile){ alert("Please upload an image or excel file."); return; }
-        if(excelFile){
-            let data = await excelFile.arrayBuffer();
-            let workbook = XLSX.read(data);
-            let sheet = workbook.Sheets[workbook.SheetNames[0]];
-            let rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-            if(rows && rows.length) await processFromData(rows);
-            else alert("Excel empty");
-        } else if(imageFile){
-            document.getElementById("statusMsg").innerHTML = "⏳ Running OCR on image...";
-            let imgUrl = URL.createObjectURL(imageFile);
-            let { data: { text } } = await Tesseract.recognize(imgUrl, 'eng', { logger: m => console.log(m) });
-            URL.revokeObjectURL(imgUrl);
-            let lines = text.split(/\r?\n/).filter(l=>l.trim().length>0).map(l=>l.split(/\s{2,}|\t/));
-            let maxCols = Math.max(...lines.map(l=>l.length),3);
-            let matrix = lines.map(l => { while(l.length<maxCols) l.push(""); return l; });
-            await processFromData(matrix);
-        }
-    });
-    
-    // download stubs (just alerts)
-    document.getElementById("downloadFullPDFBtn").onclick = ()=>alert("📄 PDF generation: Use browser print (Ctrl+P) to save as PDF.");
-    document.getElementById("downloadFullExcelBtn").onclick = ()=>{ let ws = XLSX.utils.table_to_sheet(document.getElementById("fullDayTable")); let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"FullDay"); XLSX.writeFile(wb,"Full_Day_Report.xlsx"); };
-    document.getElementById("downloadShiftExcelBtn").onclick = ()=>{ let ws=XLSX.utils.table_to_sheet(document.getElementById("dayShiftTable")); let ws2=XLSX.utils.table_to_sheet(document.getElementById("nightShiftTable")); let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"DayShift"); XLSX.utils.book_append_sheet(wb,ws2,"NightShift"); XLSX.writeFile(wb,"Shift_Report.xlsx"); };
-    
-    renderFullDay(); renderShiftAndSummary();
-</script>
 </body>
 </html>
